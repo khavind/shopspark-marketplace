@@ -1,12 +1,13 @@
 import { useParams, Link } from "react-router-dom";
 import { products } from "@/data/products";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import AmazonHeader from "@/components/AmazonHeader";
 import AmazonFooter from "@/components/AmazonFooter";
 import StarRating from "@/components/StarRating";
 import ProductCard from "@/components/ProductCard";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, ShieldCheck, Truck, RotateCcw } from "lucide-react";
+import { ChevronLeft, ChevronRight, ShieldCheck, Truck, RotateCcw, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -14,8 +15,20 @@ const ProductDetail = () => {
   const { id } = useParams();
   const product = products.find((p) => p.id === id);
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const navigate = useNavigate();
   const [currentImage, setCurrentImage] = useState(0);
+
+  const handleWishlistToggle = () => {
+    if (!product) return;
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+      toast.success("Removed from wishlist");
+    } else {
+      addToWishlist(product);
+      toast.success("Added to wishlist");
+    }
+  };
 
   if (!product) {
     return (
@@ -184,6 +197,17 @@ const ProductDetail = () => {
                 className="amazon-btn-orange w-full py-2.5 disabled:opacity-50"
               >
                 Buy Now
+              </button>
+              <button
+                onClick={handleWishlistToggle}
+                className={`w-full py-2.5 border-2 rounded font-medium flex items-center justify-center gap-2 transition ${
+                  isInWishlist(product.id)
+                    ? "border-amazon-orange text-amazon-orange bg-orange-50"
+                    : "border-border text-foreground hover:border-amazon-orange hover:bg-orange-50"
+                }`}
+              >
+                <Heart size={18} fill={isInWishlist(product.id) ? "currentColor" : "none"} />
+                {isInWishlist(product.id) ? "Remove from Wishlist" : "Add to Wishlist"}
               </button>
               <div className="text-xs text-muted-foreground space-y-1 pt-2">
                 <p>Ships from: Amazon Clone</p>
