@@ -2,6 +2,7 @@ import { Search, ShoppingCart, MapPin, ChevronDown, Menu, Globe } from "lucide-r
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { useState } from "react";
+import amazonLogo from "@/assets/amazon-logo.png";
 
 const subNavItems = [
   "Fresh", "MX Player", "Sell", "Bestsellers", "Mobiles", "Today's Deals",
@@ -26,9 +27,7 @@ const AmazonHeader = () => {
       <div className="bg-amazon-navy px-2 py-1 flex items-center gap-1">
         {/* Logo */}
         <Link to="/" className="flex-shrink-0 px-2 py-1 border border-transparent hover:border-secondary-foreground/50 rounded">
-          <span className="text-secondary-foreground text-xl font-bold tracking-tight">
-            amazon<span className="text-amazon-orange">.in</span>
-          </span>
+          <img src={amazonLogo} alt="Amazon.in" className="h-8 object-contain" />
         </Link>
 
         {/* Deliver to */}
