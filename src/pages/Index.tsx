@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { products, categories } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import AmazonHeader from "@/components/AmazonHeader";
@@ -78,10 +78,10 @@ const Index = () => {
           </div>
           <div className="bg-card py-10 text-center">
             <h3 className="text-xl font-bold text-foreground mb-3">See personalized recommendations</h3>
-            <button className="amazon-btn-primary px-16 py-2.5 text-base">Sign in</button>
+            <Link to="/signin" className="amazon-btn-primary inline-block px-16 py-2.5 text-base">Sign in</Link>
             <p className="text-sm text-muted-foreground mt-2">
               New customer?{" "}
-              <span className="text-amazon-link hover:underline cursor-pointer">Start here.</span>
+              <Link to="/signin" className="text-amazon-link hover:underline">Start here.</Link>
             </p>
           </div>
         </>
