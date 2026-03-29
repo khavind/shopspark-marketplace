@@ -8,6 +8,7 @@ import { toast } from "sonner";
 const Checkout = () => {
   const { items, getCartTotal, placeOrder } = useCart();
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [address, setAddress] = useState<ShippingAddress>({
     fullName: "",
     phone: "",
@@ -37,14 +38,23 @@ const Checkout = () => {
     setAddress({ ...address, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!address.fullName || !address.phone || !address.addressLine1 || !address.city || !address.state || !address.pincode) {
       toast.error("Please fill in all required fields.");
       return;
     }
-    const orderId = placeOrder(address);
-    navigate(`/order-confirmation/${orderId}`);
+    try {
+      setIsSubmitting(true);
+      const orderId = await placeOrder(address);
+      toast.success("Order placed successfully! Check your email for confirmation.");
+      navigate(`/order-confirmation/${orderId}`);
+    } catch (error) {
+      console.error("Error placing order:", error);
+      toast.error("Failed to place order. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const inputClass = "w-full px-3 py-2 border border-border rounded text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-amazon-orange/50 focus:border-amazon-orange";
@@ -111,8 +121,8 @@ const Checkout = () => {
                   <span>Order Total</span>
                   <span>₹{getCartTotal().toLocaleString()}</span>
                 </div>
-                <button type="submit" className="amazon-btn-orange w-full py-2.5 mt-4">
-                  Place Order
+                <button type="submit" disabled={isSubmitting} className="amazon-btn-orange w-full py-2.5 mt-4 disabled:opacity-50">
+                  {isSubmitting ? "Placing Order..." : "Place Order"}
                 </button>
               </div>
             </div>
