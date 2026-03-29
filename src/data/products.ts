@@ -14,14 +14,24 @@ export interface Product {
 
 export const categories = [
   "All",
+  "Fresh",
+  "Bestsellers",
+  "Mobiles",
+  "Today's Deals",
+  "New Releases",
+  "Prime",
+  "Fashion",
   "Electronics",
-  "Books",
-  "Clothing",
   "Home & Kitchen",
+  "Computers",
+  "Toys & Games",
+  "Books",
+  "Gift Cards",
+  "Beauty & Personal Care",
+  "Car & Motorbike",
   "Sports & Outdoors",
   "Beauty",
-  "Toys & Games",
-  "Fashion",
+  "Clothing",
 ];
 
 export const products: Product[] = [
