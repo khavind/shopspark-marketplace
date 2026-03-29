@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { useState } from "react";
 import amazonLogo from "@/assets/amazon-logo.png";
+import SideMenu from "./SideMenu";
 
 const subNavItems = [
   "Fresh", "MX Player", "Sell", "Bestsellers", "Mobiles", "Today's Deals",
