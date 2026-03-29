@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, MapPin, ChevronDown, Menu, Globe } from "lucide-react";
+import { Search, ShoppingCart, MapPin, ChevronDown, Menu, Globe, Heart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { useState } from "react";
@@ -97,6 +97,12 @@ const AmazonHeader = () => {
         <Link to="/orders" className="hidden md:block text-secondary-foreground text-xs px-2 py-1 border border-transparent hover:border-secondary-foreground/50 rounded">
           <p className="text-secondary-foreground/70 text-[11px]">Returns</p>
           <p className="font-bold text-sm">& Orders</p>
+        </Link>
+
+        {/* Wishlist */}
+        <Link to="/wishlist" className="hidden md:flex items-center gap-1 text-secondary-foreground text-xs px-2 py-1 border border-transparent hover:border-secondary-foreground/50 rounded">
+          <Heart size={18} />
+          <span className="font-bold text-sm">Wishlist</span>
         </Link>
 
         {/* Cart */}

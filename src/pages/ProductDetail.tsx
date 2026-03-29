@@ -4,10 +4,13 @@ import { useCart } from "@/context/CartContext";
 import AmazonHeader from "@/components/AmazonHeader";
 import AmazonFooter from "@/components/AmazonFooter";
 import StarRating from "@/components/StarRating";
-import { useState } from "react";
-import { ChevronLeft, ChevronRight, ShieldCheck, Truck, RotateCcw } from "lucide-react";
+import ReviewSection from "@/components/ReviewSection";
+import RelatedProducts from "@/components/RelatedProducts";
+import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, ShieldCheck, Truck, RotateCcw, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { isInWishlist, addToWishlist, removeFromWishlist } from "@/lib/api";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -15,6 +18,56 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
   const navigate = useNavigate();
   const [currentImage, setCurrentImage] = useState(0);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    const user = localStorage.getItem("amazon_user");
+    if (user) {
+      const userData = JSON.parse(user);
+      setUserEmail(userData.email);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (userEmail && id) {
+      checkWishlist();
+    }
+  }, [userEmail, id]);
+
+  const checkWishlist = async () => {
+    try {
+      if (userEmail && id) {
+        const inWishlist = await isInWishlist(userEmail, id);
+        setIsWishlisted(inWishlist);
+      }
+    } catch (error) {
+      console.error("Error checking wishlist:", error);
+    }
+  };
+
+  const handleWishlist = async () => {
+    if (!userEmail) {
+      toast.error("Please sign in first");
+      navigate("/signin");
+      return;
+    }
+
+    try {
+      if (isWishlisted) {
+        await removeFromWishlist(userEmail, id!);
+        setIsWishlisted(false);
+        toast.success("Removed from wishlist");
+      } else {
+        await addToWishlist(userEmail, id!);
+        setIsWishlisted(true);
+        toast.success("Added to wishlist");
+      }
+    } catch (error) {
+      toast.error("Error updating wishlist");
+      console.error("Error:", error);
+    }
+  };
 
   if (!product) {
     return (
@@ -184,6 +237,16 @@ const ProductDetail = () => {
               >
                 Buy Now
               </button>
+              <button
+                onClick={handleWishlist}
+                className="w-full border border-border rounded-lg py-2.5 hover:bg-secondary transition-colors flex items-center justify-center gap-2"
+              >
+                <Heart
+                  size={20}
+                  className={isWishlisted ? "fill-amazon-deal text-amazon-deal" : "text-muted-foreground"}
+                />
+                <span>{isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}</span>
+              </button>
               <div className="text-xs text-muted-foreground space-y-1 pt-2">
                 <p>Ships from: Amazon Clone</p>
                 <p>Sold by: Amazon Clone</p>
@@ -191,6 +254,12 @@ const ProductDetail = () => {
             </div>
           </div>
         </div>
+
+        {/* Reviews Section */}
+        <ReviewSection productId={id!} userEmail={userEmail || undefined} />
+
+        {/* Related Products */}
+        <RelatedProducts currentProductId={id!} category={product.category} />
       </div>
 
       <AmazonFooter />

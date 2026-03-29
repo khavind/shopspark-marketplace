@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { Product } from "@/data/products";
+import { saveOrder, sendOrderConfirmationEmail, getUserOrders } from "@/lib/api";
 
 export interface CartItem {
   product: Product;
@@ -41,6 +42,32 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    const user = localStorage.getItem("amazon_user");
+    if (user) {
+      const userData = JSON.parse(user);
+      setUserEmail(userData.email);
+      loadOrders(userData.email);
+    }
+  }, []);
+
+  const loadOrders = async (email: string) => {
+    try {
+      const data = await getUserOrders(email);
+      const formattedOrders = data.map((o: any) => ({
+        id: o.id,
+        items: o.items,
+        total: o.total,
+        address: o.address,
+        date: o.created_at,
+      }));
+      setOrders(formattedOrders);
+    } catch (error) {
+      console.error("Error loading orders:", error);
+    }
+  };
 
   const addToCart = useCallback((product: Product) => {
     setItems((prev) => {
@@ -85,20 +112,52 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 
   const placeOrder = useCallback(
-    (address: ShippingAddress) => {
+    async (address: ShippingAddress) => {
+      if (!userEmail) {
+        throw new Error("User not authenticated");
+      }
+
       const orderId = "ORD-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).substring(2, 6).toUpperCase();
+      const total = getCartTotal();
+
       const order: Order = {
         id: orderId,
         items: [...items],
-        total: getCartTotal(),
+        total,
         address,
         date: new Date().toISOString(),
       };
-      setOrders((prev) => [order, ...prev]);
-      setItems([]);
-      return orderId;
+
+      try {
+        // Save to Supabase
+        await saveOrder(orderId, userEmail, items, total, address);
+
+        // Send email notification
+        try {
+          await sendOrderConfirmationEmail(
+            userEmail,
+            orderId,
+            items.map(item => ({
+              name: item.product.name,
+              quantity: item.quantity,
+              price: item.product.price,
+            })),
+            total
+          );
+        } catch (emailError) {
+          console.error("Error sending email:", emailError);
+          // Don't throw - email error shouldn't block order placement
+        }
+
+        setOrders((prev) => [order, ...prev]);
+        setItems([]);
+        return orderId;
+      } catch (error) {
+        console.error("Error placing order:", error);
+        throw error;
+      }
     },
-    [items, getCartTotal]
+    [items, getCartTotal, userEmail]
   );
 
   return (
