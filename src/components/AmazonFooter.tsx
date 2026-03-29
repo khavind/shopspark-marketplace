@@ -14,33 +14,35 @@ const AmazonFooter = () => {
           <div>
             <h4 className="font-bold mb-3">Get to Know Us</h4>
             <ul className="space-y-2 text-sm text-secondary-foreground/70">
-              <li className="hover:underline cursor-pointer">About Us</li>
-              <li className="hover:underline cursor-pointer">Careers</li>
-              <li className="hover:underline cursor-pointer">Press Releases</li>
+              <li><Link to="/" className="hover:underline">About Us</Link></li>
+              <li><Link to="/" className="hover:underline">Careers</Link></li>
+              <li><Link to="/" className="hover:underline">Press Releases</Link></li>
+              <li><Link to="/sell" className="hover:underline">Sell on Amazon</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold mb-3">Connect with Us</h4>
             <ul className="space-y-2 text-sm text-secondary-foreground/70">
-              <li className="hover:underline cursor-pointer">Facebook</li>
-              <li className="hover:underline cursor-pointer">Twitter</li>
-              <li className="hover:underline cursor-pointer">Instagram</li>
+              <li><a href="https://facebook.com" target="_blank" rel="noreferrer" className="hover:underline">Facebook</a></li>
+              <li><a href="https://twitter.com" target="_blank" rel="noreferrer" className="hover:underline">Twitter</a></li>
+              <li><a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:underline">Instagram</a></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold mb-3">Make Money with Us</h4>
             <ul className="space-y-2 text-sm text-secondary-foreground/70">
-              <li className="hover:underline cursor-pointer">Sell on Amazon</li>
-              <li className="hover:underline cursor-pointer">Become an Affiliate</li>
-              <li className="hover:underline cursor-pointer">Advertise Products</li>
+              <li><Link to="/sell" className="hover:underline">Sell on Amazon</Link></li>
+              <li><Link to="/sell" className="hover:underline">Become an Affiliate</Link></li>
+              <li><Link to="/sell" className="hover:underline">Advertise Products</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold mb-3">Let Us Help You</h4>
             <ul className="space-y-2 text-sm text-secondary-foreground/70">
-              <li><Link to="/orders" className="hover:underline">Your Account</Link></li>
-              <li className="hover:underline cursor-pointer">Returns Centre</li>
-              <li className="hover:underline cursor-pointer">Help</li>
+              <li><Link to="/account" className="hover:underline">Your Account</Link></li>
+              <li><Link to="/orders" className="hover:underline">Returns Centre</Link></li>
+              <li><Link to="/customer-service" className="hover:underline">Customer Service</Link></li>
+              <li><Link to="/customer-service" className="hover:underline">Help</Link></li>
             </ul>
           </div>
         </div>

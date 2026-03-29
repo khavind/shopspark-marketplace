@@ -1,5 +1,5 @@
 import { X, ChevronRight, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface SideMenuProps {
   open: boolean;
@@ -13,12 +13,12 @@ const trendingItems = [
 ];
 
 const digitalItems = [
-  { label: "Echo & Alexa", expandable: true },
-  { label: "Fire TV", expandable: true },
-  { label: "Kindle E-Readers & eBooks", expandable: true },
-  { label: "Audible Audiobooks", expandable: true },
-  { label: "Amazon Prime Video", expandable: true },
-  { label: "Amazon Prime Music", expandable: true },
+  { label: "Echo & Alexa", link: "/?category=Electronics" },
+  { label: "Fire TV", link: "/?category=Electronics" },
+  { label: "Kindle E-Readers & eBooks", link: "/?category=Books" },
+  { label: "Audible Audiobooks", link: "/?category=Books" },
+  { label: "Amazon Prime Video", link: "/" },
+  { label: "Amazon Prime Music", link: "/" },
 ];
 
 const shopByCategory = [
@@ -28,26 +28,28 @@ const shopByCategory = [
   { label: "Women's Fashion", link: "/?category=Fashion" },
   { label: "Home, Kitchen, Pets", link: "/?category=Home %26 Kitchen" },
   { label: "Beauty, Health, Grocery", link: "/?category=Beauty %26 Personal Care" },
-  { label: "Sports, Fitness, Bags, Luggage", link: "/?category=Fresh" },
-  { label: "Toys, Baby Products, Kids' Fashion", link: "/?category=Toys %26 Games" },
+  { label: "Sports, Fitness, Bags", link: "/?category=Fresh" },
+  { label: "Toys, Baby Products", link: "/?category=Toys %26 Games" },
   { label: "Car, Motorbike, Industrial", link: "/?category=Car %26 Motorbike" },
   { label: "Books", link: "/?category=Books" },
 ];
 
 const programsItems = [
-  { label: "Gift Cards & Mobile Recharges", expandable: true, link: "/?category=Gift Cards" },
+  { label: "Gift Cards & Mobile Recharges", link: "/?category=Gift Cards" },
   { label: "Amazon Launchpad", link: "/" },
   { label: "Amazon Business", link: "/" },
-  { label: "Handloom and Handicrafts", link: "/" },
+  { label: "Sell on Amazon", link: "/sell" },
 ];
 
 const helpItems = [
-  { label: "Your Account", link: "/orders" },
-  { label: "Customer Service", link: "/" },
-  { label: "Sign in", link: "/" },
+  { label: "Your Account", link: "/account" },
+  { label: "Customer Service", link: "/customer-service" },
+  { label: "Sign in", link: "/signin" },
 ];
 
 const SideMenu = ({ open, onClose }: SideMenuProps) => {
+  const user = JSON.parse(localStorage.getItem("amazon_user") || "null");
+
   return (
     <>
       {/* Overlay */}
@@ -65,10 +67,16 @@ const SideMenu = ({ open, onClose }: SideMenuProps) => {
         } flex flex-col`}
       >
         {/* Header */}
-        <div className="bg-amazon-navy-light px-6 py-3 flex items-center gap-3">
+        <Link
+          to={user ? "/account" : "/signin"}
+          onClick={onClose}
+          className="bg-amazon-navy-light px-6 py-3 flex items-center gap-3 hover:opacity-90"
+        >
           <User className="text-white" size={24} />
-          <span className="text-white font-bold text-lg">Hello, sign in</span>
-        </div>
+          <span className="text-white font-bold text-lg">
+            Hello, {user ? user.name : "sign in"}
+          </span>
+        </Link>
 
         {/* Close button */}
         <button
@@ -92,12 +100,7 @@ const SideMenu = ({ open, onClose }: SideMenuProps) => {
           {/* Digital Content and Devices */}
           <Section title="Digital Content and Devices">
             {digitalItems.map((item) => (
-              <MenuLink
-                key={item.label}
-                label={item.label}
-                expandable={item.expandable}
-                onClose={onClose}
-              />
+              <MenuLink key={item.label} label={item.label} link={item.link} onClose={onClose} expandable />
             ))}
           </Section>
 
@@ -115,13 +118,7 @@ const SideMenu = ({ open, onClose }: SideMenuProps) => {
           {/* Programs & Features */}
           <Section title="Programs & Features">
             {programsItems.map((item) => (
-              <MenuLink
-                key={item.label}
-                label={item.label}
-                link={item.link}
-                expandable={item.expandable}
-                onClose={onClose}
-              />
+              <MenuLink key={item.label} label={item.label} link={item.link} onClose={onClose} />
             ))}
           </Section>
 
@@ -155,27 +152,17 @@ const MenuLink = ({
   onClose,
 }: {
   label: string;
-  link?: string;
+  link: string;
   expandable?: boolean;
   onClose: () => void;
-}) => {
-  const content = (
+}) => (
+  <Link to={link} onClick={onClose}>
     <div className="flex items-center justify-between px-6 py-2.5 hover:bg-muted cursor-pointer text-sm text-foreground">
       <span>{label}</span>
       {expandable && <ChevronRight size={16} className="text-muted-foreground" />}
     </div>
-  );
-
-  if (link) {
-    return (
-      <Link to={link} onClick={onClose}>
-        {content}
-      </Link>
-    );
-  }
-
-  return content;
-};
+  </Link>
+);
 
 const Divider = () => <div className="border-t border-border mx-0" />;
 

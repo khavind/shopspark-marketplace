@@ -6,10 +6,20 @@ import amazonLogo from "@/assets/amazon-logo.png";
 import SideMenu from "./SideMenu";
 
 const subNavItems = [
-  "Fresh", "MX Player", "Sell", "Bestsellers", "Mobiles", "Today's Deals",
-  "Customer Service", "New Releases", "Prime", "Fashion", "Electronics",
-  "Amazon Pay", "Home & Kitchen", "Computers", "Toys & Games", "Books",
-  "Gift Cards", "Beauty & Personal Care", "Car & Motorbike",
+  { label: "Fresh", link: "/?category=Fresh" },
+  { label: "MX Player", link: "/" },
+  { label: "Sell", link: "/sell" },
+  { label: "Bestsellers", link: "/?category=Bestsellers" },
+  { label: "Mobiles", link: "/?category=Mobiles" },
+  { label: "Today's Deals", link: "/?category=Today's Deals" },
+  { label: "Customer Service", link: "/customer-service" },
+  { label: "New Releases", link: "/?category=New Releases" },
+  { label: "Prime", link: "/?category=Prime" },
+  { label: "Fashion", link: "/?category=Fashion" },
+  { label: "Electronics", link: "/?category=Electronics" },
+  { label: "Home & Kitchen", link: "/?category=Home %26 Kitchen" },
+  { label: "Gift Cards", link: "/?category=Gift Cards" },
+  { label: "Books", link: "/?category=Books" },
 ];
 
 const AmazonHeader = () => {
@@ -18,9 +28,13 @@ const AmazonHeader = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sideMenuOpen, setSideMenuOpen] = useState(false);
 
+  const user = JSON.parse(localStorage.getItem("amazon_user") || "null");
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate(`/?search=${encodeURIComponent(searchQuery)}`);
+    if (searchQuery.trim()) {
+      navigate(`/?search=${encodeURIComponent(searchQuery)}`);
+    }
   };
 
   return (
@@ -67,10 +81,17 @@ const AmazonHeader = () => {
         </div>
 
         {/* Account */}
-        <div className="hidden md:block text-secondary-foreground text-xs px-2 py-1 border border-transparent hover:border-secondary-foreground/50 rounded cursor-pointer">
-          <p className="text-secondary-foreground/70 text-[11px]">Hello, sign in</p>
-          <p className="font-bold text-sm flex items-center gap-0.5">Account & Lists <ChevronDown size={10} /></p>
-        </div>
+        <Link
+          to={user ? "/account" : "/signin"}
+          className="hidden md:block text-secondary-foreground text-xs px-2 py-1 border border-transparent hover:border-secondary-foreground/50 rounded"
+        >
+          <p className="text-secondary-foreground/70 text-[11px]">
+            Hello, {user ? user.name : "sign in"}
+          </p>
+          <p className="font-bold text-sm flex items-center gap-0.5">
+            Account & Lists <ChevronDown size={10} />
+          </p>
+        </Link>
 
         {/* Returns & Orders */}
         <Link to="/orders" className="hidden md:block text-secondary-foreground text-xs px-2 py-1 border border-transparent hover:border-secondary-foreground/50 rounded">
@@ -99,14 +120,15 @@ const AmazonHeader = () => {
         </button>
         {subNavItems.map((item) => (
           <Link
-            key={item}
-            to={`/?category=${encodeURIComponent(item)}`}
+            key={item.label}
+            to={item.link}
             className="whitespace-nowrap px-2 py-1 border border-transparent hover:border-secondary-foreground/50 rounded text-[13px]"
           >
-            {item}
+            {item.label}
           </Link>
         ))}
       </div>
+
       <SideMenu open={sideMenuOpen} onClose={() => setSideMenuOpen(false)} />
     </header>
   );
