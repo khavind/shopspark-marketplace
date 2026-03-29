@@ -653,7 +653,6 @@ export const products: Product[] = [
     inStock: true,
     specifications: { Material: "925 Sterling Silver", Pieces: "3", Lengths: "16, 18, 20 inch", Hypoallergenic: "Yes", Packaging: "Velvet Pouch" },
   },
-  },
   // ── Fresh ──
   {
     id: "45",
