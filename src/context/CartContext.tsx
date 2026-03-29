@@ -34,6 +34,7 @@ interface CartContextType {
   getCartTotal: () => number;
   getCartCount: () => number;
   placeOrder: (address: ShippingAddress) => string;
+  cancelOrder: (orderId: string) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -101,9 +102,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [items, getCartTotal]
   );
 
+  const cancelOrder = useCallback((orderId: string) => {
+    setOrders((prev) => prev.filter((order) => order.id !== orderId));
+  }, []);
+
   return (
     <CartContext.Provider
-      value={{ items, orders, addToCart, removeFromCart, updateQuantity, clearCart, getCartTotal, getCartCount, placeOrder }}
+      value={{ items, orders, addToCart, removeFromCart, updateQuantity, clearCart, getCartTotal, getCartCount, placeOrder, cancelOrder }}
     >
       {children}
     </CartContext.Provider>

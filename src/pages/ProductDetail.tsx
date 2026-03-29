@@ -1,11 +1,13 @@
 import { useParams, Link } from "react-router-dom";
 import { products } from "@/data/products";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import AmazonHeader from "@/components/AmazonHeader";
 import AmazonFooter from "@/components/AmazonFooter";
 import StarRating from "@/components/StarRating";
+import ProductCard from "@/components/ProductCard";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, ShieldCheck, Truck, RotateCcw } from "lucide-react";
+import { ChevronLeft, ChevronRight, ShieldCheck, Truck, RotateCcw, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -13,8 +15,20 @@ const ProductDetail = () => {
   const { id } = useParams();
   const product = products.find((p) => p.id === id);
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const navigate = useNavigate();
   const [currentImage, setCurrentImage] = useState(0);
+
+  const handleWishlistToggle = () => {
+    if (!product) return;
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+      toast.success("Removed from wishlist");
+    } else {
+      addToWishlist(product);
+      toast.success("Added to wishlist");
+    }
+  };
 
   if (!product) {
     return (
@@ -184,12 +198,45 @@ const ProductDetail = () => {
               >
                 Buy Now
               </button>
+              <button
+                onClick={handleWishlistToggle}
+                className={`w-full py-2.5 border-2 rounded font-medium flex items-center justify-center gap-2 transition ${
+                  isInWishlist(product.id)
+                    ? "border-amazon-orange text-amazon-orange bg-orange-50"
+                    : "border-border text-foreground hover:border-amazon-orange hover:bg-orange-50"
+                }`}
+              >
+                <Heart size={18} fill={isInWishlist(product.id) ? "currentColor" : "none"} />
+                {isInWishlist(product.id) ? "Remove from Wishlist" : "Add to Wishlist"}
+              </button>
               <div className="text-xs text-muted-foreground space-y-1 pt-2">
                 <p>Ships from: Amazon Clone</p>
                 <p>Sold by: Amazon Clone</p>
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Related Products */}
+        <div className="mt-12 border-t border-border pt-8">
+          <h2 className="text-2xl font-bold text-foreground mb-4">Related Products</h2>
+          {(() => {
+            const relatedProducts = products
+              .filter((p) => p.category === product.category && p.id !== product.id)
+              .slice(0, 6);
+
+            if (relatedProducts.length === 0) {
+              return <p className="text-muted-foreground">No related products available.</p>;
+            }
+
+            return (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {relatedProducts.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            );
+          })()}
         </div>
       </div>
 
