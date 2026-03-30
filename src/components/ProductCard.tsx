@@ -1,11 +1,15 @@
 import { Link } from "react-router-dom";
 import { Product } from "@/data/products";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import StarRating from "./StarRating";
+import { Heart } from "lucide-react";
 import { toast } from "sonner";
 
 const ProductCard = ({ product }: { product: Product }) => {
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const inWishlist = isInWishlist(product.id);
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
@@ -15,6 +19,18 @@ const ProductCard = ({ product }: { product: Product }) => {
     e.stopPropagation();
     addToCart(product);
     toast.success("Added to cart!");
+  };
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (inWishlist) {
+      removeFromWishlist(product.id);
+      toast.success("Removed from wishlist");
+    } else {
+      addToWishlist(product);
+      toast.success("Added to wishlist");
+    }
   };
 
   return (
@@ -31,6 +47,12 @@ const ProductCard = ({ product }: { product: Product }) => {
             {discount}% off
           </span>
         )}
+        <button
+          onClick={handleWishlistToggle}
+          className="absolute top-2 right-2 p-1.5 rounded-full bg-card/80 hover:bg-card shadow transition"
+        >
+          <Heart size={16} fill={inWishlist ? "currentColor" : "none"} className={inWishlist ? "text-amazon-orange" : "text-muted-foreground"} />
+        </button>
       </div>
       <h3 className="text-sm text-foreground line-clamp-2 mb-1 group-hover:text-amazon-orange transition-colors">
         {product.name}
